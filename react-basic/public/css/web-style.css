@@ -1,0 +1,121 @@
+/* lab logo code */
+.web-logo-container {
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.web-logo {
+    width: 7rem;
+}
+
+.web-logo a {
+  display: block;
+}
+
+.web-logo:nth-child(1) {
+  margin-right: 10px;
+}
+
+.web-logo-sky {
+  width: 85px !important;
+}
+
+@media (min-width: 40em) {
+  .web-logo-sky {
+    width: 6rem !important;
+  }
+}
+
+@media (min-width: 64em) {
+  .web-logo-sky {
+    width: 95px !important;
+  }
+}
+
+@media (min-width: 75em) {
+  .web-logo-sky {
+    width: 115px !important;
+  }
+}
+
+/* animation code */
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.camera-blinker {
+    /* change the blinker speed by changing the time */
+  animation: blinker 0.4s linear infinite; 
+}
+
+.vis-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.popup-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-header {
+  margin-bottom: 5px;
+}
+
+.popup-subheader {
+  font-size: 1.4rem;
+  margin: 0 !important;
+}
+
+
+.vis-container video {
+    margin-right: 14px;
+}
+
+.leaflet-popup-content{
+    width: max-content !important;
+}
+
+.leaflet-popup-content-wrapper{
+    width: max-content !important;
+}
+
+@keyframes circle-breath {
+   0% {
+      box-shadow: 0 0 0 0 rgba(204, 73, 152, 60%);
+   }
+
+  90% {
+      box-shadow: 0 0 0 36px rgba(204, 73, 152, 0%);
+  }
+
+  100% {
+      box-shadow: 0 0 0 0 rgba(204, 73, 152, 0%);
+  }
+}
+
+.camera-circle-breath {
+  box-shadow: 0 0 0 0 rgb(204, 73, 152); 
+  border-radius: 80%;
+  animation: circle-breath 1.5s infinite;
+}
+
+#statistics {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+#statistics canvas {
+  max-height: 400px;
+  max-width: 50%;
+  flex: 1;  /* Each canvas will take up equal space */
+  margin: 10px; /* Optional: adds some space between the charts */
+}
