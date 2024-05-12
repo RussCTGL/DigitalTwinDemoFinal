@@ -1,5 +1,9 @@
 # DigitalTwinDemoFinal
+# 
 # Getting Started with Create React App
+# 
+# This is a reconstructed version of digital twin model on the basis of react.js
+# Attached is the instruction on how to utilize React
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
