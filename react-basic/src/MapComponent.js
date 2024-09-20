@@ -2,12 +2,28 @@ import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import Hls from 'hls.js';
 import 'leaflet/dist/leaflet.css';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
+import * as cocoSsd from '@tensorflow-models/coco-ssd';
 
 const MapComponent = ({ camData }) => {
   const [map, setMap] = useState(null);
   const [activeCameraId, setActiveCameraId] = useState(null);
 
   useEffect(() => {
+    const initializeTF = async () => {
+      await tf.ready();
+      
+      // Set WebGL memory limit
+      tf.env().set('WEBGL_MAX_TEXTURE_SIZE', 1024);
+
+      // Set WebGL backend or fallback to CPU
+      await tf.setBackend('webgl').catch(() => tf.setBackend('cpu'));
+    };
+
+    initializeTF();
+
     const initMap = L.map('camera-sensor-map').setView([43.063, -89.42], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
@@ -79,6 +95,12 @@ const MapComponent = ({ camData }) => {
       hls.attachMedia(videoElement);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         videoElement.play().catch(err => console.error('Error playing video:', err));
+
+        // Start car detection loop
+        setInterval(async () => {
+          const predictions = await detectCars(videoElement);
+          trackCarMovement(predictions);
+        }, 1000);
       });
     } else if (videoElement && videoElement.canPlayType('application/vnd.apple.mpegurl')) {
       videoElement.play().catch(err => console.error('Error playing video:', err));
@@ -86,6 +108,32 @@ const MapComponent = ({ camData }) => {
   };
 
   return <div id="camera-sensor-map" style={{ height: '500px' }} />;
+};
+
+const detectCars = async (videoElement) => {
+  const model = await cocoSsd.load();
+  const predictions = await model.detect(videoElement);
+  return predictions.filter(p => p.class === 'car' || p.class === 'truck');
+};
+
+let lastPositions = {};
+
+const trackCarMovement = (predictions) => {
+  predictions.forEach(prediction => {
+    const { bbox } = prediction; // [x, y, width, height]
+    const id = bbox.toString();
+    
+    if (lastPositions[id]) {
+      const [lastX, lastY] = lastPositions[id];
+      const [currentX, currentY] = [bbox[0], bbox[1]];
+
+      if (Math.abs(currentX - lastX) < 5 && Math.abs(currentY - lastY) < 5) {
+        console.log('Car stopped:', prediction);
+      }
+    }
+
+    lastPositions[id] = [bbox[0], bbox[1]];
+  });
 };
 
 export default MapComponent;
